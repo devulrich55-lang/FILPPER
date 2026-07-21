@@ -48,6 +48,11 @@ Sans `npm run build`, Next.js affiche :
 | Build | `npm install && npm run build` |
 | Start | `npm start` |
 
+Render detecte aussi automatiquement le script `render-build` dans `package.json`.
+
+Si le deploy echoue encore, va dans **Render > Settings > Build Command** et mets :
+`npm install && npm run build`
+
 Un fichier `render.yaml` est inclus a la racine du projet.
 
 ## Version HTML simple
