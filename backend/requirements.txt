@@ -6,4 +6,5 @@ pydantic
 pydantic-settings
 pyjwt
 python-multipart
-passlib[bcrypt]
+bcrypt
+bleak

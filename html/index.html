@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Flliter Mobile</title>
+    <title>Flipper Mobile</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -13,7 +13,7 @@
         <div class="logo-wrap login-logo">
           <div class="logo-icon">◎</div>
           <div>
-            <p class="brand">FLLITER MOBILE</p>
+            <p class="brand">FLIPPER MOBILE</p>
             <h1>Connexion</h1>
           </div>
         </div>
@@ -64,12 +64,21 @@
         </div>
       </header>
 
+      <nav class="app-tabs panel" aria-label="Navigation principale">
+        <button type="button" data-tab="home" class="active">Accueil</button>
+        <button type="button" data-tab="scan">Scan BLE</button>
+        <button type="button" data-tab="control">Controle</button>
+        <button type="button" data-tab="tools">Outils</button>
+        <button type="button" data-tab="dashboard">Dashboard</button>
+      </nav>
+
+      <section data-tab-panel="home" class="tab-panel">
       <section class="hero">
         <aside class="feature-panel panel">
           <div class="logo-wrap">
             <div class="logo-icon">◎</div>
             <div>
-              <p class="brand">FLLITER MOBILE</p>
+              <p class="brand">FLIPPER MOBILE</p>
               <h1>Localiser · Proteger · Controler</h1>
             </div>
           </div>
@@ -129,22 +138,30 @@
               <button type="submit" class="action blue">Ajouter appareil</button>
             </form>
           </article>
+        </section>
+      </section>
+      </section>
 
-          <article class="phone panel">
-            <div class="phone-header">Scan Avance</div>
-            <div class="radar">
-              <div class="ring r1"></div>
-              <div class="ring r2"></div>
-              <div class="ring r3"></div>
-              <div class="sweep"></div>
-            </div>
-            <p id="scanStatus" class="api-status">Pret pour scan BLE</p>
-            <button id="scanBtn" class="action blue">Lancer scan BLE</button>
-            <div id="scanResults" class="mini-list">
-              <p>Aucun scan effectue</p>
-            </div>
-          </article>
+      <section data-tab-panel="scan" class="tab-panel hidden">
+        <article class="phone panel scan-panel">
+          <div class="phone-header">Analyse de l'environnement</div>
+          <div class="radar">
+            <div class="ring r1"></div>
+            <div class="ring r2"></div>
+            <div class="ring r3"></div>
+            <div class="sweep"></div>
+          </div>
+          <p id="bleSupport" class="api-status">Verification du support Bluetooth...</p>
+          <p id="scanStatus" class="api-status">Pret pour analyse BLE</p>
+          <button id="scanBtn" class="action blue">Lancer analyse environnement</button>
+          <div id="scanResults" class="mini-list scan-results">
+            <p>Aucun scan effectue</p>
+          </div>
+        </article>
+      </section>
 
+      <section data-tab-panel="control" class="tab-panel hidden">
+        <section class="phones-grid control-grid">
           <article class="phone panel">
             <div class="phone-header">Controle a distance</div>
             <p id="selectedDeviceLabel" class="api-status">Aucun appareil selectionne</p>
@@ -158,7 +175,8 @@
         </section>
       </section>
 
-      <section class="bottom-showcase">
+      <section data-tab-panel="tools" class="tab-panel hidden">
+      <section class="bottom-showcase tools-showcase">
         <div class="small-phones">
           <article class="phone mini panel">
             <div class="phone-header">Mode sans connexion</div>
@@ -176,8 +194,11 @@
             <button id="sendLockBtn" class="action blue">Envoyer</button>
           </article>
         </div>
+      </section>
+      </section>
 
-        <article class="laptop panel">
+      <section data-tab-panel="dashboard" class="tab-panel hidden">
+        <article class="laptop panel dashboard-panel">
           <div class="laptop-top">
             <p class="brand">FLLITER MOBILE</p>
             <h2>Dashboard Admin</h2>
@@ -194,15 +215,16 @@
       </section>
 
       <section class="capabilities panel">
-        <span>Localisation intelligente</span>
-        <span>Verrouillage a distance</span>
-        <span>Effacement securise</span>
-        <span>Capture camera</span>
-        <span>Surveillance IMEI/IP</span>
-        <span>Notifications temps reel</span>
+        <button type="button" class="cap-btn" data-goto-tab="home">Localisation intelligente</button>
+        <button type="button" class="cap-btn" data-goto-tab="control">Verrouillage a distance</button>
+        <button type="button" class="cap-btn" data-goto-tab="control">Effacement securise</button>
+        <button type="button" class="cap-btn" data-goto-tab="scan">Detection BLE</button>
+        <button type="button" class="cap-btn" data-goto-tab="dashboard">Surveillance IMEI/IP</button>
+        <button type="button" class="cap-btn" data-goto-tab="dashboard">Notifications temps reel</button>
       </section>
     </main>
 
     <script src="./app.js"></script>
   </body>
 </html>
+

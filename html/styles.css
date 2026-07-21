@@ -540,7 +540,8 @@ h1 { font-size: 1.05rem; margin-top: 4px; }
   padding: 12px;
 }
 
-.capabilities span {
+.capabilities span,
+.cap-btn {
   display: grid;
   place-items: center;
   text-align: center;
@@ -551,6 +552,66 @@ h1 { font-size: 1.05rem; margin-top: 4px; }
   color: var(--text);
   font-size: 0.78rem;
   opacity: 0.9;
+  cursor: pointer;
+}
+
+.cap-btn:hover {
+  border-color: var(--brand);
+  opacity: 1;
+}
+
+.app-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  padding: 10px;
+  margin-bottom: 14px;
+}
+
+.app-tabs button {
+  border: 1px solid var(--line);
+  background: var(--card-bg);
+  color: var(--muted);
+  border-radius: 10px;
+  padding: 10px 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.app-tabs button.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
+.tab-panel {
+  margin-bottom: 14px;
+}
+
+.scan-panel {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.scan-results .scan-item {
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.control-grid {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.tools-showcase {
+  grid-template-columns: 1fr;
+}
+
+.dashboard-panel {
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 @keyframes spin {
@@ -567,4 +628,5 @@ h1 { font-size: 1.05rem; margin-top: 4px; }
   .phones-grid { grid-template-columns: 1fr; }
   .small-phones { grid-template-columns: 1fr; }
   .capabilities { grid-template-columns: repeat(2, 1fr); }
+  .app-tabs { grid-template-columns: repeat(2, 1fr); }
 }

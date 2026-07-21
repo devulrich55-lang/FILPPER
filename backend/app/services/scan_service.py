@@ -15,11 +15,14 @@ def scan_result_from_payload(payload: Dict[str, Any], *, scan_type: str) -> Dict
     if not items and payload.get("tag_uid"):
         items = [payload]
     if not items:
+        hints = {
+            "ble": "Aucun appareil BLE detecte. Activez le Bluetooth du PC, ouvrez Chrome/Edge sur localhost, et mettez les telephones en mode appairage.",
+        }
         return {
             "scan_type": scan_type,
             "count": 0,
             "items": [],
-            "message": "Aucun resultat. Lancez un scan avec materiel connecte ou envoyez les donnees detectees.",
+            "message": hints.get(scan_type, "Aucun resultat. Lancez un scan avec materiel connecte ou envoyez les donnees detectees."),
         }
     return {
         "scan_type": scan_type,

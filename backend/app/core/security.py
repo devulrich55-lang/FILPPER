@@ -1,21 +1,20 @@
 from datetime import datetime, timedelta
 from typing import List, Optional, Tuple
 
+import bcrypt
 import jwt
 from fastapi import HTTPException, status
-from passlib.context import CryptContext
 
 from app.core.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+    return hashed.decode("utf-8")
 
 
 def verify_password(password: str, password_hash: str) -> bool:
-    return pwd_context.verify(password, password_hash)
+    return bcrypt.checkpw(password.encode("utf-8"), password_hash.encode("utf-8"))
 
 
 def _parse_scopes(scopes: str) -> List[str]:
@@ -58,4 +57,3 @@ def decode_access_token(token: str) -> Tuple[int, List[str]]:
         )
 
     return int(user_id_raw), scopes
-

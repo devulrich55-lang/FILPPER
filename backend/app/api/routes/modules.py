@@ -11,6 +11,7 @@ from app.db.models import EventLog, LibraryItem, Operation, Device
 from app.db.session import get_session
 from app.services.library_service import delete_item, get_item, list_items, update_item, upsert_item
 from app.services.ai_service import run_ai_analysis
+from app.services.ble_scanner import scan_ble_devices
 from app.services.scan_service import latest_ble_scan_results, register_detected_devices, scan_result_from_payload
 from app.services.operations_service import create_operation, require_authorized
 
@@ -478,10 +479,23 @@ def ble_scan(payload: Dict[str, Any], ctx=Depends(get_current_user_and_scopes), 
     user, scopes = ctx
     _require(scopes, "ble:scan")
     dry = _dry_run_default(payload)
-    result = scan_result_from_payload(payload, scan_type="ble")
+
+    items = payload.get("devices") or payload.get("items") or payload.get("results") or []
+    source = "client"
+
+    if not items and payload.get("use_server_scan", True):
+        timeout = float(payload.get("timeout", 8))
+        items = scan_ble_devices(timeout=timeout)
+        source = "server"
+
+    scan_payload = {**payload, "devices": items}
+    result = scan_result_from_payload(scan_payload, scan_type="ble")
+    result["source"] = source
+
     if payload.get("register") and result.get("items"):
         result["registered"] = register_detected_devices(session, user, result["items"])
-    op = create_operation(session, user, op_type="ble.scan", payload=payload, status="done", scope_required="ble:scan", dry_run=dry)
+
+    op = create_operation(session, user, op_type="ble.scan", payload=scan_payload, status="done", scope_required="ble:scan", dry_run=dry)
     op.result = result  # type: ignore[assignment]
     session.add(op)
     session.commit()
