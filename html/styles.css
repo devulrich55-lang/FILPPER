@@ -376,6 +376,47 @@ h1 { font-size: 1.05rem; margin-top: 4px; }
   font-size: 0.8rem;
 }
 
+.device-item {
+  width: 100%;
+  text-align: left;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 8px;
+  font-size: 0.8rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.device-item.selected-device {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 1px var(--brand);
+}
+
+.add-device-form {
+  margin-top: 10px;
+  display: grid;
+  gap: 6px;
+}
+
+.add-device-form input,
+.phone.mini textarea,
+#lockMessage {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text);
+  padding: 8px;
+  font-size: 0.82rem;
+}
+
+.journal-list {
+  margin-top: 10px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
 .radar {
   position: relative;
   border-radius: 50%;

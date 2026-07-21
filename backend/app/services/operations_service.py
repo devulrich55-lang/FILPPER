@@ -17,7 +17,7 @@ def create_operation(
     payload: Dict[str, Any],
     status: str = "queued",
     scope_required: str = "",
-    dry_run: bool = True,
+    dry_run: bool = False,
 ) -> Operation:
     op = Operation(
         user_id=user.id,  # type: ignore[arg-type]

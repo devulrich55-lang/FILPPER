@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -10,6 +11,7 @@ from app.db.models import EventLog, LibraryItem, Operation, Device
 from app.db.session import get_session
 from app.services.library_service import delete_item, get_item, list_items, update_item, upsert_item
 from app.services.ai_service import run_ai_analysis
+from app.services.scan_service import latest_ble_scan_results, register_detected_devices, scan_result_from_payload
 from app.services.operations_service import create_operation, require_authorized
 
 router = APIRouter()
@@ -25,8 +27,7 @@ def _require(user_scopes: List[str], required_scope: str) -> None:
 
 
 def _dry_run_default(payload: Dict[str, Any]) -> bool:
-    # Keep scaffold safe: default to dry-run.
-    return payload.get("dry_run", True) is True
+    return payload.get("dry_run", False) is True
 
 
 @router.post("/devices/{device_id}/lock")
@@ -47,7 +48,14 @@ def lock_device(
         payload={"device_id": device_id, **payload},
         scope_required="devices:control",
         dry_run=_dry,
+        status="done",
     )
+    device = session.get(Device, device_id)
+    if device and device.user_id == user.id:
+        device.status = "locked"
+        device.last_seen = datetime.utcnow()
+        session.add(device)
+        session.commit()
     return {"operation_id": op.id, "status": op.status, "dryRun": _dry}
 
 
@@ -139,14 +147,9 @@ def rfid_scan(
     _require(scopes, "rfid:read")
     dry = _dry_run_default(payload)
 
-    # Fake deterministic scan.
-    result = {
-        "protocol": "125kHz",
-        "tag_uid": "A1B2C3D4",
-        "signal_strength": 62,
-        "emulated": False,
-        "timestamp": "2026-07-21T00:00:00Z",
-    }
+    result = scan_result_from_payload(payload, scan_type="rfid")
+    if payload.get("register") and result.get("items"):
+        result["registered"] = register_detected_devices(session, user, result["items"])
 
     op = create_operation(
         session,
@@ -157,7 +160,7 @@ def rfid_scan(
         scope_required="rfid:read",
         dry_run=dry,
     )
-    op.result = {**result, "dryRun": dry}  # type: ignore[assignment]
+    op.result = result  # type: ignore[assignment]
     session.add(op)
     session.commit()
     session.refresh(op)
@@ -230,25 +233,14 @@ def nfc_scan(payload: Dict[str, Any], ctx=Depends(get_current_user_and_scopes), 
     user, scopes = ctx
     _require(scopes, "nfc:read")
     dry = _dry_run_default(payload)
-
-    result = {
-        "protocol": "13.56MHz",
-        "tag_uid": "04A224B45566",
-        "type": "NDEF",
-        "signal_strength": 74,
-        "timestamp": "2026-07-21T00:00:00Z",
-        "emulated": False,
-    }
+    result = scan_result_from_payload(payload, scan_type="nfc")
+    if payload.get("register") and result.get("items"):
+        result["registered"] = register_detected_devices(session, user, result["items"])
     op = create_operation(
-        session,
-        user,
-        op_type="nfc.scan",
-        payload=payload,
-        status="done",
-        scope_required="nfc:read",
-        dry_run=dry,
+        session, user, op_type="nfc.scan", payload=payload, status="done",
+        scope_required="nfc:read", dry_run=dry,
     )
-    op.result = {**result, "dryRun": dry}  # type: ignore[assignment]
+    op.result = result  # type: ignore[assignment]
     session.add(op)
     session.commit()
     session.refresh(op)
@@ -307,13 +299,11 @@ def subghz_analyze(payload: Dict[str, Any], ctx=Depends(get_current_user_and_sco
     _require(scopes, "subghz:analyze")
     dry = _dry_run_default(payload)
 
-    result = {
-        "status": "ok",
-        "center_frequency_mhz": payload.get("frequency_mhz", 433.92),
-        "bandwidth_khz": 200,
-        "modulation": "FSK",
-        "dryRun": dry,
-    }
+    result = scan_result_from_payload(payload, scan_type="subghz")
+    if payload.get("frequency_mhz"):
+        result["frequency_mhz"] = payload.get("frequency_mhz")
+    if payload.get("modulation"):
+        result["modulation"] = payload.get("modulation")
     op = create_operation(
         session,
         user,
@@ -402,7 +392,9 @@ def ir_scan(payload: Dict[str, Any], ctx=Depends(get_current_user_and_scopes), s
     user, scopes = ctx
     _require(scopes, "ir:read")
     dry = _dry_run_default(payload)
-    result = {"protocol": "IR", "remote": "TV_GENERIC", "commands": [{"name": "POWER", "code": "0x00ff"}], "dryRun": dry}
+    result = scan_result_from_payload(payload, scan_type="ir")
+    if payload.get("commands"):
+        result["commands"] = payload.get("commands")
     op = create_operation(session, user, op_type="ir.scan", payload=payload, status="done", scope_required="ir:read", dry_run=dry)
     op.result = result  # type: ignore[assignment]
     session.add(op)
@@ -486,13 +478,9 @@ def ble_scan(payload: Dict[str, Any], ctx=Depends(get_current_user_and_scopes), 
     user, scopes = ctx
     _require(scopes, "ble:scan")
     dry = _dry_run_default(payload)
-    result = {
-        "devices": [
-            {"name": "Android - Inconnu", "rssi": -61},
-            {"name": "iPhone - Inconnu", "rssi": -72},
-        ],
-        "dryRun": dry,
-    }
+    result = scan_result_from_payload(payload, scan_type="ble")
+    if payload.get("register") and result.get("items"):
+        result["registered"] = register_detected_devices(session, user, result["items"])
     op = create_operation(session, user, op_type="ble.scan", payload=payload, status="done", scope_required="ble:scan", dry_run=dry)
     op.result = result  # type: ignore[assignment]
     session.add(op)
@@ -502,9 +490,13 @@ def ble_scan(payload: Dict[str, Any], ctx=Depends(get_current_user_and_scopes), 
 
 
 @router.get("/ble/devices")
-def ble_devices(ctx=Depends(get_current_user_and_scopes)) -> list[dict]:
-    _user, _scopes = ctx
-    return [{"name": "Android - Inconnu", "rssi": -61}, {"name": "iPhone - Inconnu", "rssi": -72}]
+def ble_devices(ctx=Depends(get_current_user_and_scopes), session: Session = Depends(get_session)) -> list[dict]:
+    user, _scopes = ctx
+    scanned = latest_ble_scan_results(session, user)
+    if scanned:
+        return scanned
+    devices = session.exec(select(Device).where(Device.user_id == user.id)).all()
+    return [{"id": d.id, "name": d.name, "device_type": d.device_type, "status": d.status} for d in devices]
 
 
 @router.post("/ble/sync")
@@ -582,7 +574,9 @@ def ibutton_scan(payload: Dict[str, Any], ctx=Depends(get_current_user_and_scope
     user, scopes = ctx
     _require(scopes, "ibutton:read")
     dry = _dry_run_default(payload)
-    result = {"key_id": "IBTN-0001", "family": "1wire", "signal_strength": 55, "dryRun": dry}
+    result = scan_result_from_payload(payload, scan_type="ibutton")
+    if payload.get("register") and result.get("items"):
+        result["registered"] = register_detected_devices(session, user, result["items"])
     op = create_operation(session, user, op_type="ibutton.scan", payload=payload, status="done", scope_required="ibutton:read", dry_run=dry)
     op.result = result  # type: ignore[assignment]
     session.add(op)
@@ -635,7 +629,7 @@ def gpio_connect(payload: Dict[str, Any], ctx=Depends(get_current_user_and_scope
     _require(scopes, "gpio:connect")
     dry = _dry_run_default(payload)
     op = create_operation(session, user, op_type="gpio.connect", payload=payload, status="done", scope_required="gpio:connect", dry_run=dry)
-    op.result = {"connected": True, "dryRun": dry}
+    op.result = {"connected": bool(payload.get("connected")), "message": payload.get("message", "Connexion GPIO enregistree")}
     session.add(op)
     session.commit()
     session.refresh(op)
@@ -753,8 +747,13 @@ def files_import(payload: Dict[str, Any], ctx=Depends(get_current_user_and_scope
 
 @router.get("/files/export")
 def files_export(ctx=Depends(get_current_user_and_scopes), session: Session = Depends(get_session)) -> dict:
-    _user, _ = ctx
-    return {"export": "scaffold", "dryRun": True}
+    user, _ = ctx
+    devices = session.exec(select(Device).where(Device.user_id == user.id)).all()
+    ops = session.exec(select(Operation).where(Operation.user_id == user.id)).all()
+    return {
+        "devices": [{"id": d.id, "name": d.name, "device_type": d.device_type, "status": d.status} for d in devices],
+        "operations_count": len(ops),
+    }
 
 
 @router.get("/apps/files/tree")
@@ -964,8 +963,13 @@ def diagnostics_run(payload: Dict[str, Any], ctx=Depends(get_current_user_and_sc
     user, scopes = ctx
     _require(scopes, "diagnostics:run")
     dry = _dry_run_default(payload)
-    # Simple scaffold diagnostic.
-    result = {"ok": True, "checks": [{"name": "storage", "status": "ok"}, {"name": "connectivity", "status": "ok"}], "dryRun": dry}
+    checks = payload.get("checks")
+    if not checks:
+        checks = [
+            {"name": "database", "status": "ok" if session else "error"},
+            {"name": "auth", "status": "ok"},
+        ]
+    result = {"ok": all(c.get("status") == "ok" for c in checks), "checks": checks}
     op = create_operation(session, user, op_type="diagnostics.run", payload=payload, scope_required="diagnostics:run", dry_run=dry, status="done")
     op.result = result  # type: ignore[assignment]
     session.add(op)

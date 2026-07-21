@@ -123,6 +123,11 @@
             <div id="deviceList" class="mini-list">
               <p>Chargement...</p>
             </div>
+            <form id="addDeviceForm" class="add-device-form">
+              <input id="deviceName" type="text" placeholder="Nom appareil" required />
+              <input id="deviceType" type="text" placeholder="Type (Android, iOS...)" required />
+              <button type="submit" class="action blue">Ajouter appareil</button>
+            </form>
           </article>
 
           <article class="phone panel">
@@ -133,15 +138,16 @@
               <div class="ring r3"></div>
               <div class="sweep"></div>
             </div>
-            <ul class="mini-bullets">
-              <li>Bluetooth Low Energy</li>
-              <li>Frequence Radio</li>
-              <li>NFC Passif</li>
-            </ul>
+            <p id="scanStatus" class="api-status">Pret pour scan BLE</p>
+            <button id="scanBtn" class="action blue">Lancer scan BLE</button>
+            <div id="scanResults" class="mini-list">
+              <p>Aucun scan effectue</p>
+            </div>
           </article>
 
           <article class="phone panel">
             <div class="phone-header">Controle a distance</div>
+            <p id="selectedDeviceLabel" class="api-status">Aucun appareil selectionne</p>
             <div class="lock-icon">🔒</div>
             <button class="action blue" data-device-action="lock">Verrouiller</button>
             <button class="action orange" data-device-action="ring">Faire sonner</button>
@@ -156,17 +162,18 @@
         <div class="small-phones">
           <article class="phone mini panel">
             <div class="phone-header">Mode sans connexion</div>
-            <p>Triangulation · RF · Partage communautaire</p>
+            <p id="offlineInfo">Position basee sur la derniere activite enregistree en base.</p>
           </article>
           <article class="phone mini panel">
             <div class="phone-header">Faire sonner</div>
-            <p class="timer">00:15</p>
-            <button class="action red">Arreter</button>
+            <p id="ringTimer" class="timer">00:00</p>
+            <p id="ringStatus" class="api-status">Aucune sonnerie active</p>
+            <button id="stopRingBtn" class="action red">Arreter</button>
           </article>
           <article class="phone mini panel">
             <div class="phone-header">Verrouiller l'appareil</div>
-            <p>Message personnalise...</p>
-            <button class="action blue">Envoyer</button>
+            <textarea id="lockMessage" rows="3" placeholder="Message personnalise..."></textarea>
+            <button id="sendLockBtn" class="action blue">Envoyer</button>
           </article>
         </div>
 
@@ -181,7 +188,8 @@
             <div><span id="stat-recup">--</span><small>Recuperes</small></div>
             <div><span id="stat-alertes">--</span><small>Alertes</small></div>
           </div>
-          <div id="laptopMap" class="laptop-map">Carte globale + activite recente</div>
+          <div id="laptopMap" class="laptop-map">Activite recente</div>
+          <div id="journalList" class="mini-list journal-list"></div>
         </article>
       </section>
 
