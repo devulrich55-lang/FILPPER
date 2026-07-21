@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flliter Mobile</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <!-- Ecran de connexion (visible par defaut) -->
+    <section id="loginScreen" class="login-screen">
+      <div class="login-card panel">
+        <div class="logo-wrap login-logo">
+          <div class="logo-icon">◎</div>
+          <div>
+            <p class="brand">FLLITER MOBILE</p>
+            <h1>Connexion</h1>
+          </div>
+        </div>
+
+        <label>API URL</label>
+        <input id="apiBase" type="text" value="http://localhost:8000" />
+
+        <label>Username</label>
+        <input id="username" type="text" value="Ulrich" />
+
+        <label>Password</label>
+        <input id="password" type="password" value="Ulrich11+" />
+
+        <div class="api-actions">
+          <button id="registerBtn" class="action ghost">Register</button>
+          <button id="loginBtn" class="action blue">Login</button>
+        </div>
+
+        <p id="authStatus" class="api-status">Connectez-vous pour acceder a l'application</p>
+      </div>
+    </section>
+
+    <!-- Application (cachee avant connexion) -->
+    <main id="appContent" class="poster hidden">
+      <header class="app-header panel">
+        <div>
+          <p class="brand">FLLITER MOBILE</p>
+          <p id="userInfo" class="user-info">Utilisateur connecte</p>
+        </div>
+        <button id="logoutBtn" class="action ghost">Deconnexion</button>
+      </header>
+
+      <section class="hero">
+        <aside class="feature-panel panel">
+          <div class="logo-wrap">
+            <div class="logo-icon">◎</div>
+            <div>
+              <p class="brand">FLLITER MOBILE</p>
+              <h1>Localiser · Proteger · Controler</h1>
+            </div>
+          </div>
+
+          <p class="tagline">
+            Meme sans Bluetooth · Sans Wi-Fi<br />
+            Fonctionne intelligemment !
+          </p>
+
+          <div class="feature-list">
+            <article class="feature-card">
+              <span class="feature-dot green"></span>
+              <div>
+                <h3>Detection avancee</h3>
+                <p>Reperez vos appareils meme hors connexion.</p>
+              </div>
+            </article>
+            <article class="feature-card">
+              <span class="feature-dot blue"></span>
+              <div>
+                <h3>Securite totale</h3>
+                <p>Verrouillage, effacement et protection des donnees.</p>
+              </div>
+            </article>
+            <article class="feature-card">
+              <span class="feature-dot orange"></span>
+              <div>
+                <h3>Notifications intelligentes</h3>
+                <p>Alertes en temps reel sur tous vos appareils.</p>
+              </div>
+            </article>
+            <article class="feature-card">
+              <span class="feature-dot violet"></span>
+              <div>
+                <h3>IA integree</h3>
+                <p>Analyse predictive et recommandations automatiques.</p>
+              </div>
+            </article>
+          </div>
+        </aside>
+
+        <section class="phones-grid">
+          <article class="phone panel">
+            <div class="phone-header">Accueil</div>
+            <div class="phone-map">
+              <div class="pulse"></div>
+              <span class="pin p1"></span>
+              <span class="pin p2"></span>
+              <span class="pin p3"></span>
+            </div>
+            <div id="deviceList" class="mini-list">
+              <p>Chargement...</p>
+            </div>
+          </article>
+
+          <article class="phone panel">
+            <div class="phone-header">Scan Avance</div>
+            <div class="radar">
+              <div class="ring r1"></div>
+              <div class="ring r2"></div>
+              <div class="ring r3"></div>
+              <div class="sweep"></div>
+            </div>
+            <ul class="mini-bullets">
+              <li>Bluetooth Low Energy</li>
+              <li>Frequence Radio</li>
+              <li>NFC Passif</li>
+            </ul>
+          </article>
+
+          <article class="phone panel">
+            <div class="phone-header">Controle a distance</div>
+            <div class="lock-icon">🔒</div>
+            <button class="action blue" data-device-action="lock">Verrouiller</button>
+            <button class="action orange" data-device-action="ring">Faire sonner</button>
+            <button class="action red" data-device-action="wipe">Effacer les donnees</button>
+            <button class="action ghost" data-device-action="message">Afficher message</button>
+            <p id="deviceActionStatus" class="api-status">Action: aucune</p>
+          </article>
+        </section>
+      </section>
+
+      <section class="bottom-showcase">
+        <div class="small-phones">
+          <article class="phone mini panel">
+            <div class="phone-header">Mode sans connexion</div>
+            <p>Triangulation · RF · Partage communautaire</p>
+          </article>
+          <article class="phone mini panel">
+            <div class="phone-header">Faire sonner</div>
+            <p class="timer">00:15</p>
+            <button class="action red">Arreter</button>
+          </article>
+          <article class="phone mini panel">
+            <div class="phone-header">Verrouiller l'appareil</div>
+            <p>Message personnalise...</p>
+            <button class="action blue">Envoyer</button>
+          </article>
+        </div>
+
+        <article class="laptop panel">
+          <div class="laptop-top">
+            <p class="brand">FLLITER MOBILE</p>
+            <h2>Dashboard Admin</h2>
+          </div>
+          <div class="stat-row">
+            <div><span id="stat-total">--</span><small>Total Appareils</small></div>
+            <div><span id="stat-detectes">--</span><small>Detectes aujourd'hui</small></div>
+            <div><span id="stat-recup">--</span><small>Recuperes</small></div>
+            <div><span id="stat-alertes">--</span><small>Alertes</small></div>
+          </div>
+          <div id="laptopMap" class="laptop-map">Carte globale + activite recente</div>
+        </article>
+      </section>
+
+      <section class="capabilities panel">
+        <span>Localisation intelligente</span>
+        <span>Verrouillage a distance</span>
+        <span>Effacement securise</span>
+        <span>Capture camera</span>
+        <span>Surveillance IMEI/IP</span>
+        <span>Notifications temps reel</span>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

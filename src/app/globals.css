@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-bg-primary text-white antialiased;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+
+  .card {
+    @apply rounded-2xl bg-bg-card border border-white/10;
+  }
+
+  .btn-primary {
+    @apply bg-accent-blue hover:bg-blue-600 text-white font-semibold rounded-xl px-6 py-3 transition-all shadow-glow;
+  }
+
+  .btn-danger {
+    @apply bg-accent-red hover:bg-red-600 text-white font-semibold rounded-xl px-6 py-3 transition-all shadow-glow-red;
+  }
+
+  .btn-warning {
+    @apply bg-accent-orange hover:bg-orange-600 text-white font-semibold rounded-xl px-6 py-3 transition-all;
+  }
+
+  .btn-secondary {
+    @apply bg-bg-elevated hover:bg-white/10 text-white font-semibold rounded-xl px-6 py-3 transition-all border border-white/10;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes radar-sweep {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-radar {
+  animation: radar-sweep 3s linear infinite;
+}
