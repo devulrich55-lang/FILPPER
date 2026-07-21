@@ -19,7 +19,7 @@ Frontend de l'application **Flliter Mobile** — sécurité et suivi d'appareils
 |-------|-------|
 | `/dashboard` | Admin Dashboard — Stats, carte, graphiques |
 
-## Demarrage
+## Demarrage (developpement)
 
 ```bash
 npm install
@@ -27,6 +27,28 @@ npm run dev
 ```
 
 Ouvrir [http://localhost:3000](http://localhost:3000)
+
+## Production (important)
+
+Avant `npm start`, il faut **toujours** builder :
+
+```bash
+npm install
+npm run build
+npm start
+```
+
+Sans `npm run build`, Next.js affiche :
+`Could not find a production build in the '.next' directory`
+
+### Deploiement (Render / VPS)
+
+| Etape | Commande |
+|-------|----------|
+| Build | `npm install && npm run build` |
+| Start | `npm start` |
+
+Un fichier `render.yaml` est inclus a la racine du projet.
 
 ## Version HTML simple
 

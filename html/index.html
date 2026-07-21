@@ -27,6 +27,15 @@
         <label>Password</label>
         <input id="password" type="password" value="Ulrich11+" />
 
+        <label>Theme couleur</label>
+        <select id="themeSelect" class="theme-select">
+          <option value="ocean">Ocean Blue</option>
+          <option value="emerald">Emerald Tech</option>
+          <option value="light">Light Pro</option>
+          <option value="purple">Midnight Purple</option>
+          <option value="carbon">Carbon Orange</option>
+        </select>
+
         <div class="api-actions">
           <button id="registerBtn" class="action ghost">Register</button>
           <button id="loginBtn" class="action blue">Login</button>
@@ -43,7 +52,16 @@
           <p class="brand">FLLITER MOBILE</p>
           <p id="userInfo" class="user-info">Utilisateur connecte</p>
         </div>
-        <button id="logoutBtn" class="action ghost">Deconnexion</button>
+        <div class="header-actions">
+          <select id="themeSelectApp" class="theme-select" title="Changer le theme">
+            <option value="ocean">Ocean Blue</option>
+            <option value="emerald">Emerald Tech</option>
+            <option value="light">Light Pro</option>
+            <option value="purple">Midnight Purple</option>
+            <option value="carbon">Carbon Orange</option>
+          </select>
+          <button id="logoutBtn" class="action ghost">Deconnexion</button>
+        </div>
       </header>
 
       <section class="hero">

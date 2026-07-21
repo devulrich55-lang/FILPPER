@@ -6,6 +6,8 @@ const ui = {
   apiBase: document.getElementById("apiBase"),
   username: document.getElementById("username"),
   password: document.getElementById("password"),
+  themeSelect: document.getElementById("themeSelect"),
+  themeSelectApp: document.getElementById("themeSelectApp"),
   loginBtn: document.getElementById("loginBtn"),
   registerBtn: document.getElementById("registerBtn"),
   logoutBtn: document.getElementById("logoutBtn"),
@@ -22,6 +24,31 @@ const ui = {
 
 let authToken = storage.getItem("flliter_token") || "";
 let currentDeviceId = null;
+
+const THEMES = {
+  ocean: "Ocean Blue — cyber securite (actuel)",
+  emerald: "Emerald Tech — vert securite, tres lisible",
+  light: "Light Pro — fond clair, maximum visibilite",
+  purple: "Midnight Purple — premium, moderne",
+  carbon: "Carbon Orange — sombre + alertes orange",
+};
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  storage.setItem("flliter_theme", theme);
+  if (ui.themeSelect) ui.themeSelect.value = theme;
+  if (ui.themeSelectApp) ui.themeSelectApp.value = theme;
+}
+
+function bindThemeSelectors() {
+  const saved = storage.getItem("flliter_theme") || "ocean";
+  applyTheme(saved);
+
+  [ui.themeSelect, ui.themeSelectApp].forEach((select) => {
+    if (!select) return;
+    select.addEventListener("change", (e) => applyTheme(e.target.value));
+  });
+}
 
 function showLoginScreen() {
   ui.loginScreen.classList.remove("hidden");
@@ -177,6 +204,7 @@ async function runDeviceAction(actionName) {
 }
 
 function bindEvents() {
+  bindThemeSelectors();
   ui.apiBase.value = storage.getItem("flliter_api_base") || ui.apiBase.value;
   ui.apiBase.addEventListener("change", () => {
     storage.setItem("flliter_api_base", getApiBase());
